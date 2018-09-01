@@ -1,0 +1,115 @@
+第一种   我自己用的是第三种，正常可以用
+
+java里面时间类型转换成json数据就成这样啦
+"createTime":{"date":30,"day":3,"hours":15,"minutes":14,"month":3,"nanos":0,"seconds"
+:38,"time":1209539678000,"timezoneOffset":-480,"year":108}
+在gridpanel里面就会显示成[object,object]
+在store里面这样写
+{
+name : 'createTime',
+type : 'date',
+mapping : 'createTime.time',
+dateFormat : 'time'
+}
+在ColumnModel里面这样写
+{
+header : "创建时间",
+sortable : true,
+dataIndex : 'createTime',
+renderer : Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+}
+就会显示成你想要的格式不用在后台处理成字符串啦。
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------
+{
+					xtype: 'datefield',
+					fieldLabel: '过磅日期',
+					width: 360,
+					format : 'Y-m-d',
+					name: 'eEmptydate',
+					dataIndex:'eEmptydate',
+				}
+
+
+
+
+ {
+			name: 'eEmptydate',//eEmptydate zzj-1
+			type: 'date',
+			mapping : 'eEmptydate.time',
+			dateFormat : 'time'
+			//dateFormat: 'Y-m-d H:i:s'
+		}
+
+
+
+
+
+
+{
+				id: '',
+				text: '空车过磅日期',
+				sortable: true,
+				//与定义的类中的属性匹配
+				dataIndex: 'eEmptydate',
+			
+				renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+				flex: 0,
+				width: 75,
+			}
+
+
+
+
+   */
+    @DateTimeFormat(pattern="yyyy-MM-dd")spring mvc 中的注解 转换
+    private Date eEmptydate;
+
+    /**
+     * 重车过磅日期-
+     */
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private Date eFulldate;
+
+--------------------------------------------------------------------------------------------------------------------
+
+提示错误的！！！！！！！！！！！！！！！！
+
+
+
+
+			var flag=action.response.responseText;                      //获取原始出错代码，是网页形式的代码
+                        var win=window.open('','','scrollbars=yes,width=400,height=200');      //所以要创建个窗口来显示上面的代码
+                        win.document.open("text/html","replace");
+                         win.document.write(flag);
+                         win.document.close();         
+                         //Ext.Msg.alert('操作', flag);  //该提示也可以显示错误，但界面不好看
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
