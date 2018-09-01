@@ -1,0 +1,56 @@
+
+	//1.获取本县的所属部门记站级部门id（为了默认用的）
+                                	getZhanByXian({
+                                		callback:function(zhanId){
+                                			//2.
+                                			getAllZhan(zhanId);
+                                		}
+                                	},items.aBumenid);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//获取当前修改县级用户来查站级用户id,参数ids为县级id
+function getZhanByXian(p,ids){
+	
+	$.ajax({
+		
+		url : PageContext + "/cbumenubyfatherid.do", // 后台url
+		data : { // 数据
+			"id" : ids
+		},
+		type : "POST", // 类型，POST或者GET
+		dataType : 'json', // 数据返回类型，可以是xml、json等
+		success : function(data) { // 成功，回调函数
+			 
+			
+			var callback = p?p.callback:null; // 获取参数对象中的回调方法
+			  if($.isFunction(p.callback)){ // 如果有回调方法
+			    callback(data.id); // 返回一个计算后的数据，方便回调方法使用它
+			  }
+			  
+			  
+		
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) { // 失败，回调函数
+			return '';
+			// 状态码
+			//alert(XMLHttpRequest.status + "<br/>"
+			//		+ XMLHttpRequest.readyState + "<br/>" + textStatus);
+		}
+	});
+}

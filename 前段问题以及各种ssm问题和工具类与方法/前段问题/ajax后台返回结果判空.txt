@@ -1,0 +1,41 @@
+function trans(data){
+		return data==null || data==""?"空":data;
+	} 
+	
+	function ajax(){
+		$.ajax({
+				url:"${path}/selectBySomeInfo.do",
+				//contentType: "text/html;charset=utf-8",
+				 data:{
+					//"province":encodeURI(encodeURI(province)),
+					"province":province,
+					"year":year,
+					"type":type,
+					"bigType":bigType
+				},  
+				scriptCharset:"utf-8",
+				success:function(res){
+					if(res.length==0){
+						alert("没有数据！");
+						return ;
+					}
+					var t="";
+					console.log(res.length)
+					for (var x=0;x<res.length;x++){
+						var r="<td>"+trans(res[x].aSf)+"</td><td>"+
+						trans(res[x].aCreateTime).substring(0,4)+"</td><td>"+
+						trans(res[x].aBigType)+"</td><td>"+
+						trans(res[x].aSclx)+"</td><td>"+
+						trans(res[x].aBfznl)+"</td><td>"+
+						trans(res[x].aBfzxm)+"</td><td>"+
+						trans(res[x].aBfzlxfs)+"</td><td>"+
+						trans(res[x].aGdmj)+"</td><td>"+
+						trans(res[x].aSfzcpp)+"</td><td>"+
+						trans(res[x].aSfck)+"</td>";
+						r="<tr>"+r+"</tr>";
+						$("#bo").append(r);
+					}
+				}
+				
+			})
+	}

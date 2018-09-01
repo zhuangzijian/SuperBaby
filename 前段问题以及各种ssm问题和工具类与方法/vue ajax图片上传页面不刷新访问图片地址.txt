@@ -1,0 +1,154 @@
+JSP前段保存页面
+ <label class="control-label">品种照片&nbsp;&nbsp;</label>
+					<input id="filename" name="filename" type="file">
+			<div class="controls">
+				<input type="hidden" name="newtypepic" class="input-xlarge newtypepic" id=""
+					v-model="vueObj.newtypepic"/>
+			</div>
+
+
+
+
+JS放入from发送到数据库
+
+// 保存表单数据
+function saveNtypProAch(vueObj) {
+	 var formData = new FormData();
+	   var img_file = $("#filename");
+	   var fileObj = img_file[0].files[0];
+	   formData.append("filename",fileObj);
+	   formData.append("vueObj",JSON.stringify(vueObj)),
+	// alert(vueObj);
+	$.ajax({
+		type : 'post',
+		url : PageContext + '/saveNtyp.do',
+		dataType : 'json',
+		data :formData,
+		 async:false,
+	     processData:false,
+	     contentType :false,
+		success : function(data) {
+			alert("保存成功(" + data + ")!");
+		},
+		error : function(data, type, err) {
+			alert("错误类型：" + type + "; 错误信息：" + err);
+		}
+	});
+}
+
+
+
+
+后台进行保存的两种方法
+/**
+	 * 添加&更新 -主要仪器设备数据库
+	 * @param request
+	 * @param resProAch
+	 * @param httpSession
+	 * @return
+	 * @throws IOException 
+	 */
+	@ResponseBody
+	@RequestMapping("/saveNtyp.do")
+	public int saveNytp(HttpServletRequest request,String vueObj,@RequestParam(value = "filename", required = false) MultipartFile filename,
+			 HttpSession httpSession) throws IOException{
+		// 将json解析为基础表数据
+				TNewType Nytp = JSONObject.parseObject(vueObj, TNewType.class);
+				
+				
+				
+		//图片上传下载
+		 if (!filename.isEmpty()) {
+			 //获取当前的项目地址
+      	   String url=request.getSession().getServletContext().getRealPath("pictures\\");
+
+          File file = new File(url);
+          String fileName = filename.getOriginalFilename();
+          String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+          
+          if (!file.isDirectory() && !file.exists()) {
+              file.mkdir();
+          }
+
+          InputStream is = filename.getInputStream();
+         // String name = filename.getOriginalFilename();
+          String name= UUID.randomUUID().toString();
+
+          FileOutputStream fileOutputStream = new FileOutputStream(url + "\\" + name+"."+suffix);
+
+          byte[] b = new byte[is.available()];
+
+          is.read(b);
+
+          fileOutputStream.write(b);
+          fileOutputStream.close();
+         String urlname="pictures\\" + name+"."+suffix;
+         Nytp.setNewtypepic(urlname);
+      } 
+		
+		 
+		int result = 0;
+		Nytp.setCreatedatetime(new Date());
+		if(Nytp.getId()!=null){
+			result = newTypeMapper.updateByPrimaryKey(Nytp);
+		}else{
+		    result = newTypeMapper.insert(Nytp);
+		}
+		
+        return result;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+后台纯保存的方法
+
+@ResponseBody
+	@RequestMapping("/upload.do")
+    public Object upload(@RequestParam(value = "filename", required = false) MultipartFile filename,HttpServletRequest request)
+            throws IOException {
+        if (!filename.isEmpty()) {
+        	   String url=request.getSession().getServletContext().getRealPath("pictures\\");
+        	   //String url =path+"/pictures"; 
+           // String url = "questionnaire/webapp";
+
+            File file = new File(url);
+
+            if (!file.isDirectory() && !file.exists()) {
+                file.mkdir();
+            }
+
+            InputStream is = filename.getInputStream();
+           // String name = filename.getOriginalFilename();
+            String name= UUID.randomUUID().toString();
+
+            FileOutputStream fileOutputStream = new FileOutputStream(url + "\\" + name);
+
+            byte[] b = new byte[is.available()];
+
+            is.read(b);
+
+            fileOutputStream.write(b);
+            fileOutputStream.close();
+            url=url + "\\" + name;
+            return url;
+        } else {
+            return "on";
+        }
+    }
+	
+
+
+
+

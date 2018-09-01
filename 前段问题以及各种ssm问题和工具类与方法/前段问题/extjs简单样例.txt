@@ -1,0 +1,218 @@
+<Context path="/XJManager" docBase="D:/xjmanager/XJManager/WebContent" reloadable="true"/>
+Ext.Loader.setConfig({
+	enabled: true
+});
+var required = '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>';
+var requiredimportant = '<span style="color:red;font-weight:bold" data-qtip="Required">***</span>';
+//设置路径
+Ext.Loader.setPath('Ext.ux', '../../common/ux/');
+
+//定义需要的插件
+Ext.require([
+	'Ext.data.*',
+	'Ext.grid.*',
+	'Ext.util.*',
+	'Ext.tip.QuickTipManager',
+	'Ext.ux.data.PagingMemoryProxy',
+	'Ext.ux.ProgressBarPager',
+	'Ext.selection.CheckboxModel',
+	'Ext.ux.RowExpander',
+	'Ext.selection.CellModel',
+	'Ext.ux.CheckColumn',
+	'Ext.state.*',
+	'Ext.form.*'
+]);
+//-------------以上部分全部copy，下面开始自己写--------------
+
+//0 定义一个model
+Ext.define('AddSampleList', {
+	extend: 'Ext.data.Model',
+	idProperty: 'spId',
+	fields: [{name: 'spId',type: 'string'},
+             {name:'spCode',type:'string'}
+	]}); 
+//1 ext的查询列表动作
+//主函数
+Ext.onReady(function() {
+	
+	//1.1这是仓库，仓库用到了model，模型的字段和后台要对应
+	var store = Ext.create('Ext.data.Store', {
+		model: 'AddSampleList',
+		remoteSort: true,
+		//每页显示的数据
+		pageSize: 5,
+		proxy: {
+			type: "ajax",
+			url: '/XJManager/baction/sampleList.do', 
+			reader: {
+				type: "json",
+				root: "queryList",
+				totalProperty: 'totalCount'
+			}
+		}
+	});
+	
+	
+	
+	//1.2 这是页面显示的列表，显示的是数据，所以要用到上面定义的仓库
+	var grid = Ext.create('Ext.grid.Panel', {
+		//grid 的标题
+		title: '维护煤样采制信息 ',
+		//引入仓库
+		store: store,
+		//引入选择框
+		selModel: Ext.create('Ext.selection.CheckboxModel'),
+		
+		
+		
+		//1.2.0  停靠在列上方的一个容器，一般情况放置各种按钮
+		dockedItems: [
+			//各种按钮布局
+			{
+				xtype: 'toolbar',
+				items: [{
+					text: '添加',
+					iconCls: 'add',
+					listeners: {
+						click: function() {
+							//这个formAdd是要定义的
+							formAdd.form.reset();
+							formAdd.getForm().url="/XJManager/baction/addsample.do";
+							Ext.getCmp('spId').readOnly = false;//获得组件，设置文本框（id的文本框）是否可以编辑
+							//这个winAdd也是需要定义的，请看注释1.3
+							winAdd.add(formAdd);
+							winAdd.show();
+						}
+					}
+
+				}]}],	
+		
+		
+		
+		
+		//1.2.1 定义列
+		columns: [{
+				id: '',
+				text: '煤样编号',
+				sortable: true,
+				flex: 0,
+				width: 75,
+				dataIndex: 'spId'
+			}],
+        
+			
+			
+			
+
+		//table边框的设定
+		stripeRows: true,
+		height: 320,
+		width: 'auto',
+		frame: false,
+
+		bbar: Ext.create('Ext.PagingToolbar', {
+			pageSize: 10,
+			store: store,
+			displayInfo: true,
+			plugins: Ext.create('Ext.ux.ProgressBarPager', {})
+		}),
+
+	});
+	
+	//将table放入制定的div中
+	grid.render('grid-example');
+	//重新提交新的参数请求数据；
+	store.load();
+	
+	
+	
+	
+	//1.3 定义表单：点击添加按钮的时候，需要弹出的窗口里面是要有一个表单的
+	var formAdd = Ext.create('Ext.form.Panel', {
+		bodyStyle: {
+			background: '#DFE9F6',
+			padding: '5px',
+			border: 1
+		},
+		region: 'west',
+		plain: true,
+		border: 0,
+		bodyPadding: 0,
+		autoScroll: true,
+		width: 750,
+		layout: 'form',
+		//表单发送的到的action路径
+		url: '',
+		//默认设置
+		fieldDefaults: {
+			anchor: '100%'
+		},
+		//布局,vbox是竖排,hbox是横排
+
+		items: [{
+			layout: 'column',
+			frame: true,
+			items: [{
+				
+				xtype: 'textfield',
+				fieldLabel: '状态',
+				width: 360,
+				afterLabelTextTpl: required,
+				name: 'spState',hidden:true
+			},{
+				id:'spId',
+				xtype: 'textfield',
+				fieldLabel: '煤样编号',
+				width: 360,
+				afterLabelTextTpl: required,
+				name: 'spId',
+			}],
+		}
+		],
+	});
+	
+	
+	
+	
+	
+	
+	//1.4 当点击添加按钮的时候，弹出的窗体
+	var winAdd = new Ext.Window({
+
+		autoHight: true,
+		modal: true,
+		/*closeAction:hide,*/
+		items: [], // 这里面放你的表单。 
+		closeAction: 'close', //这里写成 'hide' 
+		/***********************表单设计结束*********************/
+		buttons: [{
+			text: "保存",
+			iconCls: "save",
+			handler: function() {
+
+				if(!formAdd.isValid()){
+					Ext.Msg.alert('请完善信息', '有必填项没有输入,请仔细检查!');
+					return;
+				}
+				formAdd.submit({
+					success: function() {
+						winAdd.hide();
+						store.reload();
+					},
+					failure: function() {
+						Ext.Msg.alert('操作失败', '操作失败,请重试!');
+					}
+				});
+				
+			}
+		}, {
+			text: "重置",
+			iconCls: "cancel",
+			handler: function() {
+		        //数据重置
+				formAdd.form.reset();
+			}
+		}]
+	});
+});
+	

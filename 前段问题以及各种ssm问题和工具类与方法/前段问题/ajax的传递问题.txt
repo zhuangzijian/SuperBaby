@@ -1,0 +1,10 @@
+ @ResponseBody 
+controller中的注解用于返回json
+
+
+ 最初使用SpringMVC时，为其ModelAndView可以直接返回页面和数据感觉爽到不行，但是当只想返回数据而不返回页面时，该怎么办呢，难道还要每次自己进行json格式转化吗，太麻烦了。
+
+用ModelAndView显然不行，因为其必须要附带视图页面，如果没有，则会报下面错误。
+
+
+json 包 用jackson 的jar包 来封装json数据 直接返回List 
