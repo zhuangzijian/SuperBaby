@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: data-center
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://114.67.100.229:3306/kafka2?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    username: root
+    password: root
+  jpa:
+    show-sql: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  #    time-zone: UTC
+  kafka:
+    bootstrap-servers: 114.67.100.229:9092
+    consumer:
+      group-id: debezium-kafka-connector
+      key-deserializer: "io.confluent.kafka.serializers.KafkaAvroDeserializer"
+      value-deserializer: "io.confluent.kafka.serializers.KafkaAvroDeserializer"
+      auto-offset-reset: earliest
+      properties:
+        schema.registry.url: http://114.67.100.229:8081
+logging:
+  level:
+    spirng:
+      jpa:
+        DEBUG
+    io:
+      debezium:
+        transforms: TRACE
+    org:
+      hibernate: DEBUG
